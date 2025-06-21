@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musical Notes Diary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(15, 126, 179, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(69, 123, 157, 0.3) 0%, transparent 50%),
+                linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #1e3c72 50%, #0f4c75 75%, #1e3c72 100%);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #4fc3f7, #29b6f6, #0277bd, #01579b);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(79, 195, 247, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInLeft 1s ease-out;
+        }
+
+        .song-form {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.02);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #0277bd, #0288d1);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(2, 119, 189, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(2, 119, 189, 0.5);
+            background: linear-gradient(135deg, #0288d1, #039be5);
+        }
+
+        .songs-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+        }
+
+        .song-item {
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #29b6f6;
+        }
+
+        .song-item:hover {
+            background: rgba(79, 195, 247, 0.2);
+            transform: translateX(5px);
+        }
+
+        .song-item h4 {
+            margin-bottom: 5px;
+            color: #4fc3f7;
+        }
+
+        .song-item p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .main-display {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInRight 1s ease-out;
+        }
+
+        .song-details {
+            margin-bottom: 30px;
+        }
+
+        .song-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #4fc3f7, #29b6f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .song-artist {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .tabs-container {
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #0277bd, #0288d1);
+            box-shadow: 0 2px 10px rgba(2, 119, 189, 0.3);
+        }
+
+        .tab-content {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            min-height: 300px;
+        }
+
+        .karaoke-section {
+            text-align: center;
+        }
+
+        .karaoke-controls {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0277bd, #4fc3f7);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .lyrics-display {
+            font-size: 1.5rem;
+            line-height: 2;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            min-height: 200px;
+        }
+
+        .current-line {
+            background: linear-gradient(135deg, #29b6f6, #4fc3f7);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: inline-block;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 20px rgba(79, 195, 247, 0.4);
+        }
+
+        .microphone-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0277bd, #0288d1);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(2, 119, 189, 0.4);
+            margin: 20px;
+        }
+
+        .microphone-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(2, 119, 189, 0.6);
+        }
+
+        .microphone-btn.recording {
+            animation: recordingPulse 1s infinite;
+        }
+
+        .audio-visualizer {
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            height: 100px;
+            margin: 20px 0;
+        }
+
+        .bar {
+            width: 4px;
+            background: linear-gradient(to top, #0277bd, #4fc3f7);
+            margin: 1px;
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+
+        .floating-notes {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 2rem;
+            animation: float 4s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes recordingPulse {
+            0%, 100% { background: linear-gradient(135deg, #0277bd, #0288d1); }
+            50% { background: linear-gradient(135deg, #0288d1, #039be5); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-notes" id="floatingNotes"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Musical Notes Diary 🎵</h1>
+            <p>Your personal song library with lyrics, tabs, and karaoke practice</p>
+            <div style="position: absolute; top: 20px; left: 20px; font-size: 2rem; opacity: 0.3;">♪</div>
+            <div style="position: absolute; top: 60px; right: 30px; font-size: 1.5rem; opacity: 0.4;">♫</div>
+            <div style="position: absolute; top: 120px; left: 50px; font-size: 1.8rem; opacity: 0.3;">♬</div>
+            <div style="position: absolute; top: 150px; right: 80px; font-size: 1.3rem; opacity: 0.4;">𝄞</div>
+            <div style="position: absolute; top: 200px; left: 150px; font-size: 1.6rem; opacity: 0.3;">♭</div>
+            <div style="position: absolute; top: 250px; right: 120px; font-size: 1.4rem; opacity: 0.4;">♯</div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="song-form">
+                    <h3>🎸 Add New Song</h3>
+                    <div class="form-group">
+                        <label>Song Title</label>
+                        <input type="text" id="songTitle" placeholder="Enter song title...">
+                    </div>
+                    <div class="form-group">
+                        <label>Artist</label>
+                        <input type="text" id="songArtist" placeholder="Enter artist name...">
+                    </div>
+                    <div class="form-group">
+                        <label>Song Link</label>
+                        <input type="url" id="songLink" placeholder="YouTube, Spotify, etc...">
+                    </div>
+                    <div class="form-group">
+                        <label>Lyrics</label>
+                        <textarea id="songLyrics" rows="4" placeholder="Paste lyrics here..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Guitar Tabs</label>
+                        <textarea id="songTabs" rows="4" placeholder="Paste guitar tabs here..."></textarea>
+                    </div>
+                    <button class="btn" onclick="addSong()">✨ Add Song</button>
+                </div>
+
+                <h3>🎼 My Songs</h3>
+                <div class="songs-list" id="songsList">
+                    <!-- Songs will be populated here -->
+                </div>
+            </div>
+
+            <div class="main-display">
+                <div class="song-details" id="songDetails">
+                    <div class="song-title">Select a Song</div>
+                    <div class="song-artist">Choose from your library or add a new one</div>
+                </div>
+
+                <div class="tabs-container">
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('lyrics')">🎤 Lyrics</button>
+                        <button class="tab" onclick="switchTab('tabs')">🎸 Tabs</button>
+                        <button class="tab" onclick="switchTab('karaoke')">🎵 Karaoke</button>
+                    </div>
+
+                    <div class="tab-content">
+                        <div id="lyrics-content">
+                            <div class="lyrics-display" id="lyricsDisplay">
+                                Select a song to view lyrics...
+                            </div>
+                        </div>
+
+                        <div id="tabs-content" style="display: none;">
+                            <div class="lyrics-display" id="tabsDisplay">
+                                Select a song to view guitar tabs...
+                            </div>
+                        </div>
+
+                        <div id="karaoke-content" style="display: none;">
+                            <div class="karaoke-section">
+                                <div class="karaoke-controls">
+                                    <button class="microphone-btn" id="micBtn" onclick="toggleRecording()">🎤</button>
+                                    <p>Click the microphone to start karaoke practice</p>
+                                </div>
+                                
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill"></div>
+                                </div>
+
+                                <div class="audio-visualizer" id="visualizer">
+                                    <!-- Audio bars will be generated here -->
+                                </div>
+
+                                <div class="lyrics-display" id="karaokeLyrics">
+                                    Select a song and start recording to practice karaoke...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let songs = [];
+        let currentSong = null;
+        let activeTab = 'lyrics';
+        let isRecording = false;
+        let karaokeProgress = 0;
+        let progressInterval = null;
+
+        // Initialize the app
+        function init() {
+            loadSongs();
+            createVisualizerBars();
+            createFloatingNotes();
+            setInterval(createFloatingNotes, 3000);
+        }
+
+        // Add a new song
+        function addSong() {
+            const title = document.getElementById('songTitle').value;
+            const artist = document.getElementById('songArtist').value;
+            const link = document.getElementById('songLink').value;
+            const lyrics = document.getElementById('songLyrics').value;
+            const tabs = document.getElementById('songTabs').value;
+
+            if (!title || !artist) {
+                alert('Please enter at least a title and artist!');
+                return;
+            }
+
+            const song = {
+                id: Date.now(),
+                title,
+                artist,
+                link,
+                lyrics,
+                tabs
+            };
+
+            songs.push(song);
+            saveSongs();
+            renderSongs();
+            clearForm();
+        }
+
+        // Clear the form
+        function clearForm() {
+            document.getElementById('songTitle').value = '';
+            document.getElementById('songArtist').value = '';
+            document.getElementById('songLink').value = '';
+            document.getElementById('songLyrics').value = '';
+            document.getElementById('songTabs').value = '';
+        }
+
+        // Save songs to localStorage
+        function saveSongs() {
+            const songsData = JSON.stringify(songs);
+            // Note: Using a simple variable instead of localStorage as per instructions
+            window.songsStorage = songsData;
+        }
+
+        // Load songs from storage
+        function loadSongs() {
+            if (window.songsStorage) {
+                songs = JSON.parse(window.songsStorage);
+                renderSongs();
+            } else {
+                // Add some sample songs
+                songs = [
+                    {
+                        id: 1,
+                        title: "Sample Song",
+                        artist: "Demo Artist",
+                        link: "https://example.com",
+                        lyrics: "This is a sample song\nWith some demo lyrics\nAdd your own songs to get started!",
+                        tabs: "G - C - D - Em\nSample chord progression\nReplace with real tabs!"
+                    }
+                ];
+                renderSongs();
+            }
+        }
+
+        // Render songs list
+        function renderSongs() {
+            const songsList = document.getElementById('songsList');
+            songsList.innerHTML = '';
+
+            songs.forEach(song => {
+                const songItem = document.createElement('div');
+                songItem.className = 'song-item';
+                songItem.innerHTML = `
+                    <h4>${song.title}</h4>
+                    <p>by ${song.artist}</p>
+                `;
+                songItem.onclick = () => selectSong(song);
+                songsList.appendChild(songItem);
+            });
+        }
+
+        // Select a song
+        function selectSong(song) {
+            currentSong = song;
+            updateSongDisplay();
+        }
+
+        // Update song display
+        function updateSongDisplay() {
+            if (!currentSong) return;
+
+            document.getElementById('songDetails').innerHTML = `
+                <div class="song-title">${currentSong.title}</div>
+                <div class="song-artist">by ${currentSong.artist}</div>
+                ${currentSong.link ? `<a href="${currentSong.link}" target="_blank" style="color: #ffd93d;">🔗 Listen</a>` : ''}
+            `;
+
+            updateTabContent();
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            activeTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update content
+            document.querySelectorAll('[id$="-content"]').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById(`${tab}-content`).style.display = 'block';
+
+            updateTabContent();
+        }
+
+        // Update tab content
+        function updateTabContent() {
+            if (!currentSong) return;
+
+            switch (activeTab) {
+                case 'lyrics':
+                    document.getElementById('lyricsDisplay').innerHTML = 
+                        currentSong.lyrics || 'No lyrics available...';
+                    break;
+                case 'tabs':
+                    document.getElementById('tabsDisplay').innerHTML = 
+                        `<pre>${currentSong.tabs || 'No tabs available...'}</pre>`;
+                    break;
+                case 'karaoke':
+                    setupKaraoke();
+                    break;
+            }
+        }
+
+        // Setup karaoke
+        function setupKaraoke() {
+            if (!currentSong || !currentSong.lyrics) {
+                document.getElementById('karaokeLyrics').innerHTML = 'No lyrics available for karaoke...';
+                return;
+            }
+
+            const lyrics = currentSong.lyrics.split('\n');
+            document.getElementById('karaokeLyrics').innerHTML = lyrics.map((line, index) => 
+                `<div class="lyric-line" data-line="${index}">${line}</div>`
+            ).join('');
+        }
+
+        // Toggle recording
+        function toggleRecording() {
+            const micBtn = document.getElementById('micBtn');
+            
+            if (!isRecording) {
+                startRecording();
+                micBtn.classList.add('recording');
+                micBtn.innerHTML = '⏹️';
+            } else {
+                stopRecording();
+                micBtn.classList.remove('recording');
+                micBtn.innerHTML = '🎤';
+            }
+        }
+
+        // Start recording
+        function startRecording() {
+            isRecording = true;
+            karaokeProgress = 0;
+            animateProgress();
+            animateVisualizer();
+            scrollLyrics();
+        }
+
+        // Stop recording
+        function stopRecording() {
+            isRecording = false;
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+        }
+
+        // Animate progress bar
+        function animateProgress() {
+            progressInterval = setInterval(() => {
+                if (karaokeProgress < 100) {
+                    karaokeProgress += 0.5;
+                    document.getElementById('progressFill').style.width = `${karaokeProgress}%`;
+                } else {
+                    stopRecording();
+                }
+            }, 100);
+        }
+
+        // Animate visualizer
+        function animateVisualizer() {
+            const bars = document.querySelectorAll('.bar');
+            
+            const animate = () => {
+                if (isRecording) {
+                    bars.forEach(bar => {
+                        const height = Math.random() * 80 + 10;
+                        bar.style.height = `${height}px`;
+                    });
+                    requestAnimationFrame(animate);
+                } else {
+                    bars.forEach(bar => {
+                        bar.style.height = '10px';
+                    });
+                }
+            };
+            animate();
+        }
+
+        // Scroll lyrics during karaoke
+        function scrollLyrics() {
+            const lines = document.querySelectorAll('.lyric-line');
+            let currentLine = 0;
+            
+            const scrollInterval = setInterval(() => {
+                if (!isRecording || currentLine >= lines.length) {
+                    clearInterval(scrollInterval);
+                    return;
+                }
+                
+                // Remove previous highlight
+                lines.forEach(line => line.classList.remove('current-line'));
+                
+                // Highlight current line
+                if (lines[currentLine]) {
+                    lines[currentLine].classList.add('current-line');
+                    lines[currentLine].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                currentLine++;
+            }, 3000); // Change line every 3 seconds
+        }
+
+        // Create visualizer bars
+        function createVisualizerBars() {
+            const visualizer = document.getElementById('visualizer');
+            for (let i = 0; i < 40; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = '10px';
+                visualizer.appendChild(bar);
+            }
+        }
+
+        // Create floating musical notes
+        function createFloatingNotes() {
+            // Removed floating animation - notes are now static decorative elements
+            // Static notes are already placed in the HTML header section
+        }
+
+        // Initialize the app when page loads
+        window.onload = init;
+    </script>
+</body>
+</html>
