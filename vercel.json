@@ -1,13 +1,7 @@
 {
   "functions": {
-    "app/api/**/*.js": {
-      "runtime": "@vercel/node"
+    "api/*.php": {
+      "runtime": "vercel-php@0.6.0"
     }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+  }
 }
